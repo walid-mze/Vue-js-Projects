@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Manipulation de vue</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+<div id="monapp">
+	<input type="text" v-model="texte" placeholder="texte" @input="verifierTexte">
+    <p v-if="messageVisible">Vous avez tapé un espace</p>
+</div>
+
+
+<script>
+	const appli = {
+		data () {
+				return {
+					texte:'',
+                    messageVisible:false
+				}
+			},
+        methods:{
+            verifierTexte(){
+                this.messageVisible = this.texte.includes(' ');
+            }
+        }
+	};
+	
+Vue.createApp(appli).mount("#monapp");
+</script>
+
+</body>
+</html>
