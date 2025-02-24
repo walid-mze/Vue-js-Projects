@@ -1,0 +1,23 @@
+[
+
+  {
+    "id": 1,
+    "title": "Faire du sport",
+    "description": "Courir pendant 30 minutes.",
+    "completed": true
+  },
+
+  {
+    "id": 2,
+    "title": "Nettoyer la maison",
+    "description": "Passer l'aspirateur et nettoyer les vitres.",
+    "completed": false
+  },
+
+  {
+    "id": 3,
+    "title": "Préparer le dîner",
+    "description": "Cuisiner un repas sain.",
+    "completed": false
+  }
+]
