@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>Les Bonnes Pièces</title>
+        <link rel="stylesheet" href="styles.css">
+        <script type="module" src="pieces.js"></script>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    </head>
+    <body>
+        <header>
+            <img src="images-ay/logo.jpg" alt="LOGO">
+            <h1>Les Bonnes Pièces</h1>
+        </header>
+        <main id="app">
+            <!-- Menu de recherche -->
+            <section class="filtres">
+                <h3>Filtres</h3>
+                <input type="text" v-model="searchQuery" placeholder="Rechercher une pièce...">
+                <select v-model="selectedCategory">
+                    <option value="">Toutes les catégories</option>
+                    <option v-for="categorie in categories" :key="categorie" :value="categorie">{{ categorie }}</option>
+                </select>
+                <label>
+                    <input type="checkbox" v-model="inStockOnly"> En stock uniquement
+                </label>
+                <select v-model="sortOrder">
+                    <option value="asc">Prix croissant</option>
+                    <option value="desc">Prix décroissant</option>
+                </select>
+            </section>
+
+            <!-- Fiches produits -->
+            <section class="fiches">
+                <div class="pauto" v-for="pauto in filteredPieces" :key="pauto.id">
+                    
+                    <img :src="pauto.image" alt="Image de {{pauto.nom}}">
+                    <div class="name">{{pauto.nom}}</div>
+                    <div cl>{{pauto.prix}} €</div>
+                    <div>{{pauto.categorie}}</div>
+                    <div :class="{'en-stock': pauto.disponible, 'expire': !pauto.disponible}">
+                        {{ pauto.disponible ? 'En stock' : 'Expiré' }}
+                    </div>
+                    <button class="add" @click.prevent="ajouter(pauto)">
+                        {{ pauto.ajoute ? 'Ajouté' : 'Ajouter au panier' }}
+                    </button>
+                </div>
+            </section>
+        </main>
+    </body>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    pieces_autos: [],
+                    panier: [],
+                    searchQuery: '',
+                    selectedCategory: '',
+                    inStockOnly: false,
+                    sortOrder: 'asc'
+                }
+            },
+        
+            computed: {
+                filteredPieces() {
+                    let filtered = this.pieces_autos.filter(pauto => {
+                        return (
+                            pauto.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+                            (this.selectedCategory === '' || pauto.categorie === this.selectedCategory) &&
+                            (!this.inStockOnly || pauto.disponible)
+                        );
+                    });
+
+                    if (this.sortOrder === 'asc') {
+                        filtered.sort((a, b) => a.prix - b.prix);
+                    } else {
+                        filtered.sort((a, b) => b.prix - a.prix);
+                    }
+
+                    return filtered;
+                },
+                categories() {
+                    return [...new Set(this.pieces_autos.map(pauto => pauto.categorie))];
+                }
+            },
+
+            mounted() {
+                fetch('pieces-autos.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.pieces_autos = data.map(pauto => {
+                            return { ...pauto, ajoute: false };
+                        });
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            },
+            methods: {
+                ajouter(pauto) {
+                    this.panier.push(pauto);
+                    pauto.ajoute = true; // Changez le texte du bouton
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</html>
